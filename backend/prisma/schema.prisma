@@ -1,0 +1,199 @@
+// Prisma Schema for CRM System
+// Database: PostgreSQL
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model with role-based access control
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  role      Role     @default(SALES_EXECUTIVE)
+  phone     String?
+  avatar    String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  leads           Lead[]
+  activities      Activity[]
+  notifications   Notification[]
+  createdLeads    Lead[]         @relation("LeadCreator")
+  assignedTasks   Task[]         @relation("AssignedUser")
+  createdTasks    Task[]         @relation("TaskCreator")
+
+  @@index([email])
+  @@index([role])
+  @@map("users")
+}
+
+// Role enumeration
+enum Role {
+  ADMIN
+  MANAGER
+  SALES_EXECUTIVE
+}
+
+// Lead model - Core CRM entity
+model Lead {
+  id          String     @id @default(uuid())
+  firstName   String
+  lastName    String
+  email       String
+  phone       String?
+  company     String?
+  position    String?
+  status      LeadStatus @default(NEW)
+  source      String?
+  value       Float?
+  priority    Priority   @default(MEDIUM)
+  description String?
+  tags        String[]
+  ownerId     String
+  createdById String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relations
+  owner      User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  createdBy  User       @relation("LeadCreator", fields: [createdById], references: [id])
+  activities Activity[]
+  tasks      Task[]
+
+  @@index([email])
+  @@index([ownerId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("leads")
+}
+
+// Lead status enumeration
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  PROPOSAL
+  NEGOTIATION
+  WON
+  LOST
+  ARCHIVED
+}
+
+// Priority enumeration
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+// Activity model - Timeline tracking
+model Activity {
+  id          String       @id @default(uuid())
+  type        ActivityType
+  subject     String
+  description String?
+  duration    Int?         // in minutes
+  outcome     String?
+  leadId      String
+  userId      String
+  scheduledAt DateTime?
+  completedAt DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  // Relations
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([leadId])
+  @@index([userId])
+  @@index([type])
+  @@index([scheduledAt])
+  @@map("activities")
+}
+
+// Activity type enumeration
+enum ActivityType {
+  NOTE
+  CALL
+  EMAIL
+  MEETING
+  TASK
+  STATUS_CHANGE
+}
+
+// Task model
+model Task {
+  id          String     @id @default(uuid())
+  title       String
+  description String?
+  status      TaskStatus @default(TODO)
+  priority    Priority   @default(MEDIUM)
+  dueDate     DateTime?
+  leadId      String?
+  assignedTo  String
+  createdById String
+  completedAt DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relations
+  lead        Lead? @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  assignedUser User @relation("AssignedUser", fields: [assignedTo], references: [id])
+  createdBy   User  @relation("TaskCreator", fields: [createdById], references: [id])
+
+  @@index([assignedTo])
+  @@index([status])
+  @@index([dueDate])
+  @@map("tasks")
+}
+
+// Task status enumeration
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+// Notification model for real-time updates
+model Notification {
+  id        String           @id @default(uuid())
+  type      NotificationType
+  title     String
+  message   String
+  isRead    Boolean          @default(false)
+  userId    String
+  metadata  Json?
+  createdAt DateTime         @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+// Notification type enumeration
+enum NotificationType {
+  LEAD_ASSIGNED
+  TASK_ASSIGNED
+  TASK_DUE
+  LEAD_STATUS_CHANGED
+  ACTIVITY_REMINDER
+  SYSTEM
+}

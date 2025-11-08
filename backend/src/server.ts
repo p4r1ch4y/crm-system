@@ -1,0 +1,104 @@
+import express, { Application, Request, Response, NextFunction } from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import dotenv from 'dotenv';
+import { createServer } from 'http';
+import { Server as SocketIOServer } from 'socket.io';
+import rateLimit from 'express-rate-limit';
+
+// Routes
+import authRoutes from './routes/auth.routes';
+import userRoutes from './routes/user.routes';
+import leadRoutes from './routes/lead.routes';
+import activityRoutes from './routes/activity.routes';
+import taskRoutes from './routes/task.routes';
+import notificationRoutes from './routes/notification.routes';
+import analyticsRoutes from './routes/analytics.routes';
+
+// Middleware
+import { errorHandler } from './middleware/error.middleware';
+import { logger } from './utils/logger';
+import { initializeSocket } from './socket/socket.handler';
+import { notificationService } from './services/notification.service';
+
+dotenv.config();
+
+const app: Application = express();
+const httpServer = createServer(app);
+const io = new SocketIOServer(httpServer, {
+  cors: {
+    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+    credentials: true,
+  },
+});
+
+// Initialize notification service with Socket.IO instance
+notificationService.setSocketIO(io);
+
+// Security middleware
+app.use(helmet());
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  credentials: true,
+}));
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'),
+  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'),
+  message: 'Too many requests from this IP, please try again later.',
+});
+
+app.use('/api', limiter);
+
+// Body parsing middleware
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Request logging
+app.use((req: Request, _res: Response, next: NextFunction) => {
+  logger.info(`${req.method} ${req.path}`);
+  next();
+});
+
+// Health check
+app.get('/health', (_req: Request, res: Response) => {
+  res.status(200).json({
+    status: 'success',
+    message: 'CRM API is running',
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// API Routes
+const API_VERSION = process.env.API_VERSION || 'v1';
+app.use(`/api/${API_VERSION}/auth`, authRoutes);
+app.use(`/api/${API_VERSION}/users`, userRoutes);
+app.use(`/api/${API_VERSION}/leads`, leadRoutes);
+app.use(`/api/${API_VERSION}/activities`, activityRoutes);
+app.use(`/api/${API_VERSION}/tasks`, taskRoutes);
+app.use(`/api/${API_VERSION}/notifications`, notificationRoutes);
+app.use(`/api/${API_VERSION}/analytics`, analyticsRoutes);
+
+// 404 handler
+app.use((_req: Request, res: Response) => {
+  res.status(404).json({
+    status: 'error',
+    message: 'Route not found',
+  });
+});
+
+// Global error handler
+app.use(errorHandler);
+
+// Initialize Socket.IO
+initializeSocket(io);
+
+const PORT = process.env.PORT || 5000;
+
+httpServer.listen(PORT, () => {
+  logger.info(`Server running on port ${PORT}`);
+  logger.info(`Environment: ${process.env.NODE_ENV}`);
+});
+
+export { app, io };
