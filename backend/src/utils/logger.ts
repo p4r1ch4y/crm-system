@@ -1,4 +1,6 @@
 import winston from 'winston';
+import fs from 'fs';
+import path from 'path';
 
 const levels = {
   error: 0,
@@ -32,13 +34,19 @@ const format = winston.format.combine(
   )
 );
 
+// Ensure logs directory exists
+const LOG_DIR = process.env.LOG_DIR || path.join(process.cwd(), 'logs');
+if (!fs.existsSync(LOG_DIR)) {
+  fs.mkdirSync(LOG_DIR, { recursive: true });
+}
+
 const transports = [
   new winston.transports.Console(),
   new winston.transports.File({
-    filename: 'logs/error.log',
+    filename: path.join(LOG_DIR, 'error.log'),
     level: 'error',
   }),
-  new winston.transports.File({ filename: 'logs/all.log' }),
+  new winston.transports.File({ filename: path.join(LOG_DIR, 'all.log') }),
 ];
 
 export const logger = winston.createLogger({
@@ -47,3 +55,49 @@ export const logger = winston.createLogger({
   format,
   transports,
 });
+
+// Dedicated audit logger (JSON only)
+export const auditLogger = winston.createLogger({
+  level: 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+  ),
+  transports: [
+    new winston.transports.File({ filename: path.join(LOG_DIR, 'audit.log') }),
+  ],
+});
+
+export type AuditEntry = {
+  ts: string;
+  method: string;
+  path: string;
+  status: number;
+  ms: number;
+  userId?: string;
+  ip?: string;
+  userAgent?: string;
+  params?: any;
+  query?: any;
+  body?: any;
+};
+
+export function redact(obj: any, keys: string[] = ['password', 'token', 'authorization']): any {
+  try {
+    const clone = JSON.parse(JSON.stringify(obj || {}));
+    const walk = (o: any) => {
+      if (!o || typeof o !== 'object') return;
+      for (const k of Object.keys(o)) {
+        if (keys.includes(k.toLowerCase())) {
+          o[k] = '[REDACTED]';
+        } else if (typeof o[k] === 'object') {
+          walk(o[k]);
+        }
+      }
+    };
+    walk(clone);
+    return clone;
+  } catch {
+    return {};
+  }
+}

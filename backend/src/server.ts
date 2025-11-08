@@ -18,6 +18,9 @@ import analyticsRoutes from './routes/analytics.routes';
 // Middleware
 import { errorHandler } from './middleware/error.middleware';
 import { logger } from './utils/logger';
+import { auditMiddleware } from './middleware/audit.middleware';
+import logRoutes from './routes/log.routes';
+import { healthHandler, readyHandler } from './controllers/health.controller';
 import { initializeSocket } from './socket/socket.handler';
 import { notificationService } from './services/notification.service';
 
@@ -55,20 +58,16 @@ app.use('/api', limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Request logging
+// Request logging & audit
 app.use((req: Request, _res: Response, next: NextFunction) => {
   logger.info(`${req.method} ${req.path}`);
   next();
 });
+app.use(auditMiddleware);
 
-// Health check
-app.get('/health', (_req: Request, res: Response) => {
-  res.status(200).json({
-    status: 'success',
-    message: 'CRM API is running',
-    timestamp: new Date().toISOString(),
-  });
-});
+// Health & readiness
+app.get('/health', healthHandler);
+app.get('/ready', readyHandler);
 
 // API Routes
 const API_VERSION = process.env.API_VERSION || 'v1';
@@ -79,6 +78,7 @@ app.use(`/api/${API_VERSION}/activities`, activityRoutes);
 app.use(`/api/${API_VERSION}/tasks`, taskRoutes);
 app.use(`/api/${API_VERSION}/notifications`, notificationRoutes);
 app.use(`/api/${API_VERSION}/analytics`, analyticsRoutes);
+app.use(`/api/${API_VERSION}/logs`, logRoutes);
 
 // 404 handler
 app.use((_req: Request, res: Response) => {
@@ -96,9 +96,12 @@ initializeSocket(io);
 
 const PORT = process.env.PORT || 5000;
 
-httpServer.listen(PORT, () => {
-  logger.info(`Server running on port ${PORT}`);
-  logger.info(`Environment: ${process.env.NODE_ENV}`);
-});
+// Only start server if not in test environment
+if (process.env.NODE_ENV !== 'test') {
+  httpServer.listen(PORT, () => {
+    logger.info(`Server running on port ${PORT}`);
+    logger.info(`Environment: ${process.env.NODE_ENV}`);
+  });
+}
 
-export { app, io };
+export { app, io, httpServer };

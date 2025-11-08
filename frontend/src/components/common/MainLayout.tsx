@@ -44,6 +44,7 @@ const MainLayout: React.FC = () => {
                   { to: '/leads', label: 'Leads' },
                   { to: '/tasks', label: 'Tasks' },
                   { to: '/activities', label: 'Activities' },
+                  ...(user && (user.role === 'ADMIN' || user.role === 'MANAGER') ? [{ to: '/logs', label: 'Logs' }] : []),
                 ].map(link => (
                   <NavLink
                     key={link.to}

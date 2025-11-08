@@ -14,6 +14,7 @@ import LeadsPage from './pages/LeadsPage';
 import LeadDetailPage from './pages/LeadDetailPage';
 import TasksPage from './pages/TasksPage';
 import ActivitiesPage from './pages/ActivitiesPage';
+import LogsPage from './pages/LogsPage';
 
 // Layout
 import MainLayout from './components/common/MainLayout';
@@ -44,6 +45,7 @@ function AppRoutes() {
         <Route path="leads/:id" element={<LeadDetailPage />} />
         <Route path="tasks" element={<TasksPage />} />
         <Route path="activities" element={<ActivitiesPage />} />
+        <Route path="logs" element={<LogsPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />

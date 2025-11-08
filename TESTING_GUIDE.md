@@ -1,11 +1,112 @@
-# CRM System - Test Guide
+# CRM System Testing Guide
 
-## ✅ System Status
-- **Backend**: Running on http://localhost:5000
-- **Frontend**: Running on http://localhost:3000
-- **Database**: PostgreSQL (connected)
+## Overview
+This guide covers comprehensive automated testing for the CRM system using Jest and Supertest, plus manual testing procedures.
 
-## 🧪 Testing Guide
+## System Status
+- **Backend**: http://localhost:5000
+- **Frontend**: http://localhost:3000
+- **Database**: PostgreSQL (Prisma ORM)
+
+---
+
+## Automated Testing with Jest
+
+### Test Files Structure
+```
+backend/tests/
+├── auth.test.ts          - Authentication & authorization
+├── lead.test.ts          - Lead CRUD operations
+├── task.test.ts          - Task management
+├── activity.test.ts      - Activity tracking
+├── analytics.test.ts     - Analytics endpoints
+├── user.test.ts          - User management & notifications
+└── health.test.ts        - Health checks & logging
+```
+
+### Running Tests
+
+#### All Tests
+```bash
+cd backend
+npm test
+```
+
+#### Specific Test File
+```bash
+npm test auth.test
+npm test lead.test
+npm test task.test
+```
+
+#### Watch Mode
+```bash
+npm run test:watch
+```
+
+#### With Coverage Report
+```bash
+npm test -- --coverage
+```
+
+### Test Coverage Summary
+
+#### Authentication Tests (`auth.test.ts`)
+- ✅ User registration (valid/invalid email, password strength)
+- ✅ User login (valid/invalid credentials, token generation)
+- ✅ Current user profile (authentication, authorization)
+
+#### Lead Tests (`lead.test.ts`)
+- ✅ Create lead (validation, duplicate prevention)
+- ✅ List leads (pagination, filtering, search)
+- ✅ Get single lead (with relationships)
+- ✅ Update lead (partial updates, status changes)
+- ✅ Delete lead (admin-only, role checks)
+
+#### Task Tests (`task.test.ts`)
+- ✅ Create task (priority, status, due dates)
+- ✅ List tasks (filtering by status, priority, lead, dates)
+- ✅ Update task (completion timestamps)
+- ✅ Delete task (permission checks)
+
+#### Activity Tests (`activity.test.ts`)
+- ✅ Create activity (types: CALL, EMAIL, MEETING, NOTE)
+- ✅ List activities (filtering, pagination)
+- ✅ Delete activity (creator validation)
+
+#### Analytics Tests (`analytics.test.ts`)
+- ✅ Dashboard overview (lead, task, activity metrics)
+- ✅ Conversion funnel (admin/manager only)
+- ✅ Sales pipeline (by stage and source)
+
+#### User Tests (`user.test.ts`)
+- ✅ List users (role filtering, pagination)
+- ✅ Get user details
+- ✅ Update user (admin-only, role changes)
+- ✅ Delete user (reassignment handling)
+- ✅ Notifications (get, mark as read)
+
+#### Health Tests (`health.test.ts`)
+- ✅ Health endpoint (liveness probe)
+- ✅ Readiness endpoint (DB connectivity)
+- ✅ Logs endpoint (admin access, filtering)
+- ✅ Log download (file streaming)
+
+### Coverage Goals
+- **Statements**: 80%+
+- **Branches**: 75%+
+- **Functions**: 80%+
+- **Lines**: 80%+
+
+View detailed coverage report:
+```bash
+# After running npm test -- --coverage
+# Open: backend/coverage/index.html
+```
+
+---
+
+## Manual Testing Guide
 
 ### 1. Authentication & Role Management
 
