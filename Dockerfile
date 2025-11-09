@@ -38,6 +38,9 @@ COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/dist ./dist
 
+# Ensure app directory is writable by non-root user (logs, etc.)
+RUN mkdir -p /app/logs && chown -R nodejs:nodejs /app
+
 USER nodejs
 EXPOSE 5000
 
