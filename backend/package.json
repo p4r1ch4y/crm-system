@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Next-Gen CRM System Backend API",
   "main": "dist/server.js",
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
+  },
   "scripts": {
     "dev": "nodemon --exec ts-node src/server.ts",
     "build": "tsc",
