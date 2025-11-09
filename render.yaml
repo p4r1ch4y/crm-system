@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: smartcrm-backend
+    runtime: docker
+    plan: free
+    region: oregon
+    repo: https://github.com/p4r1ch4y/crm-system
+    branch: main
+    healthCheckPath: /health
+    dockerfilePath: backend/Dockerfile
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: PORT
+        value: "5000"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: smartcrm-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: JWT_REFRESH_EXPIRES_IN
+        value: 30d
+      - key: CORS_ORIGIN
+        value: https://smartcrmsystem.vercel.app
+      - key: EMAIL_ENABLED
+        value: "false"
+      - key: SLACK_WEBHOOK_URL
+        sync: false
+
+databases:
+  - name: smartcrm-db
+    plan: free
+    region: oregon
