@@ -3,7 +3,7 @@
 A modern, cloud-native Customer Relationship Management (CRM) platform built for fast-scaling fitness businesses and startups. Features real-time insights, automated workflows, marketing landing page, and third-party integrations.
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-green.svg)](https://nodejs.org)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D20.0.0-green.svg)](https://nodejs.org)
 [![TypeScript](https://img.shields.io/badge/typescript-5.3.3-blue.svg)](https://www.typescriptlang.org/)
 [![Supabase](https://img.shields.io/badge/supabase-postgres-3ecf8e.svg)](https://supabase.com)
 [![Render](https://img.shields.io/badge/deploy-render-46E3B7.svg)](https://render.com)
@@ -168,7 +168,7 @@ docker-compose up -d
 ## Tech Stack
 
 ### Backend
-- **Runtime**: Node.js 18+ LTS
+- **Runtime**: Node.js 20+ LTS
 - **Framework**: Express.js 4.x
 - **Language**: TypeScript 5.3
 - **Database**: Supabase PostgreSQL
@@ -379,9 +379,9 @@ After seeding the database (`npx prisma db seed`):
 
 ### System Requirements
 
-- **Node.js**: 18.0.0 or higher
+- **Node.js**: 20.0.0 or higher (LTS recommended)
 - **npm**: 9.0.0 or higher
-- **PostgreSQL**: 15+ (Supabase handles this)
+- **PostgreSQL**: 15+ (Supabase handles this in production)
 - **Docker**: 20.10+ (for local development only)
 
 ### Backend Setup Details

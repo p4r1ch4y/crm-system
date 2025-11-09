@@ -1,11 +1,13 @@
 # Frontend Dockerfile - Multi-stage build
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
 # Accept build arguments
 ARG VITE_API_URL=http://localhost:5000/api/v1
+ARG VITE_SOCKET_URL=http://localhost:5000
 ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_SOCKET_URL=$VITE_SOCKET_URL
 
 # Copy package files
 COPY package*.json ./
