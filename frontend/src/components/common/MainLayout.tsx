@@ -40,11 +40,12 @@ const MainLayout: React.FC = () => {
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
                 {[
-                  { to: '/dashboard', label: 'Dashboard' },
-                  { to: '/leads', label: 'Leads' },
-                  { to: '/tasks', label: 'Tasks' },
-                  { to: '/activities', label: 'Activities' },
-                  ...(user && (user.role === 'ADMIN' || user.role === 'MANAGER') ? [{ to: '/logs', label: 'Logs' }] : []),
+                  { to: '/app/dashboard', label: 'Dashboard' },
+                  { to: '/app/leads', label: 'Leads' },
+                  { to: '/app/tasks', label: 'Tasks' },
+                  { to: '/app/activities', label: 'Activities' },
+                  { to: '/app/integrations', label: 'Integrations' },
+                  ...(user && (user.role === 'ADMIN' || user.role === 'MANAGER') ? [{ to: '/app/logs', label: 'Logs' }] : []),
                 ].map(link => (
                   <NavLink
                     key={link.to}

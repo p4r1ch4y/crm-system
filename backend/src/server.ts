@@ -14,6 +14,7 @@ import activityRoutes from './routes/activity.routes';
 import taskRoutes from './routes/task.routes';
 import notificationRoutes from './routes/notification.routes';
 import analyticsRoutes from './routes/analytics.routes';
+import integrationRoutes from './routes/integration.routes';
 
 // Middleware
 import { errorHandler } from './middleware/error.middleware';
@@ -79,6 +80,7 @@ app.use(`/api/${API_VERSION}/tasks`, taskRoutes);
 app.use(`/api/${API_VERSION}/notifications`, notificationRoutes);
 app.use(`/api/${API_VERSION}/analytics`, analyticsRoutes);
 app.use(`/api/${API_VERSION}/logs`, logRoutes);
+app.use(`/api/${API_VERSION}/integrations`, integrationRoutes);
 
 // 404 handler
 app.use((_req: Request, res: Response) => {

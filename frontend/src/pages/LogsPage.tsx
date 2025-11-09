@@ -6,7 +6,7 @@ import { Navigate } from 'react-router-dom';
 const LogsPage: React.FC = () => {
   const { user } = useAppSelector((s) => s.auth);
   if (!user || (user.role !== 'ADMIN' && user.role !== 'MANAGER')) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/app/dashboard" replace />;
   }
   return (
     <div className="space-y-6">

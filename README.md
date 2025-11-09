@@ -1,121 +1,205 @@
-# Next-Gen CRM System
+# SmartCRM Pro - Next-Gen CRM System
 
-A modern, scalable Customer Relationship Management (CRM) platform built for fast-scaling startups. Features real-time insights, automated workflows, and collaborative tools - all in one place.
+A modern, cloud-native Customer Relationship Management (CRM) platform built for fast-scaling fitness businesses and startups. Features real-time insights, automated workflows, marketing landing page, and third-party integrations.
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-green.svg)](https://nodejs.org)
 [![TypeScript](https://img.shields.io/badge/typescript-5.3.3-blue.svg)](https://www.typescriptlang.org/)
+[![Supabase](https://img.shields.io/badge/supabase-postgres-3ecf8e.svg)](https://supabase.com)
+[![Render](https://img.shields.io/badge/deploy-render-46E3B7.svg)](https://render.com)
 
 ## Table of Contents
 
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Architecture](#architecture)
-- [Quick Start with Docker](#quick-start-with-docker)
-- [Getting Started](#getting-started)
-- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Production Deployment](#production-deployment)
+- [Local Development](#local-development)
 - [Database Schema](#database-schema)
 - [API Documentation](#api-documentation)
 - [Testing](#testing)
-- [Docker Deployment](#docker-deployment)
 - [Environment Variables](#environment-variables)
 - [Project Structure](#project-structure)
+- [Documentation](#documentation)
 - [Contributing](#contributing)
 
-## Quick Start with Docker 🐳
+## Architecture
 
-The fastest way to get started! Requires only Docker installed.
+SmartCRM Pro uses a modern three-tier cloud-native architecture:
 
-```bash
-# Clone the repository
-git clone <your-repo-url>
-cd MastersUnion
-
-# Copy environment template
-cp .env.docker.example .env
-
-# Start with one command (Windows PowerShell)
-.\docker-start.ps1
-
-# Or on Linux/Mac
-chmod +x docker-start.sh
-./docker-start.sh
+```
+┌──────────────────┐       ┌──────────────────┐       ┌──────────────────┐
+│   React SPA      │ ───── │  Express API     │ ───── │  Supabase        │
+│   (Render)       │       │  (Render)        │       │  PostgreSQL      │
+│   Static Site    │       │  Web Service     │       │  + Auth/Storage  │
+└──────────────────┘       └──────────────────┘       └──────────────────┘
 ```
 
-Access the application at **http://localhost** 🎉
+**Production Stack:**
+- **Frontend**: Render Static Site (React + Vite + Nginx)
+- **Backend**: Render Web Service (Node.js + Express)
+- **Database**: Supabase PostgreSQL (managed, with backups)
+- **Storage**: Supabase Storage (future: file uploads)
+- **Auth**: JWT (future migration to Supabase Auth)
+- **Email**: Supabase Email Service (future)
+
+📐 **Detailed Architecture**: See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for system design, ER diagrams, and workflow diagrams.
+
+---
+
+## Quick Start
+
+### Option 1: Production Deploy (Recommended)
+
+Deploy to Render + Supabase in minutes:
+
+1. **Create Supabase Project**
+   - Sign up at [supabase.com](https://supabase.com)
+   - Create new project, save database password
+   - Copy connection string
+
+2. **Deploy to Render**
+   ```bash
+   # Fork this repository on GitHub
+   # Go to render.com dashboard
+   # Connect GitHub repository
+   # Deploy backend + frontend (see detailed guide)
+   ```
+
+3. **Access Your CRM**
+   - Frontend: `https://smartcrm.onrender.com`
+   - Backend API: `https://smartcrm-backend.onrender.com`
+
+📖 **Complete Guide**: [DOCKER_DEPLOYMENT.md](docs/DOCKER_DEPLOYMENT.md) (now covers Render deployment)
+
+### Option 2: Local Development with Docker
+
+For local development:
+
+```bash
+# Clone repository
+git clone https://github.com/your-username/crm-system
+cd MastersUnion
+
+# Start local environment
+docker-compose up -d
+
+# Access at http://localhost:3000
+```
 
 **Default Credentials:**
 - Admin: `admin@crm.com` / `Admin@123`
 - Manager: `manager@crm.com` / `Manager@123`
-- Sales: `sales@crm.com` / `Sales@123`
-
-📖 **Detailed Guide**: See [DOCKER_DEPLOYMENT.md](./DOCKER_DEPLOYMENT.md) for complete Docker documentation.
-
----
+- Sales: `sales1@crm.com` / `Sales@123`
 
 ## Features
 
-### Core Features
+### Core CRM Features
 
-- **Authentication & Role Management**
+- **🔐 Authentication & Role Management**
   - JWT-based authentication with secure token management
   - Role-based access control (Admin, Manager, Sales Executive)
   - Protected routes and API endpoints
+  - Future: Supabase Auth integration
 
-- **Lead Management**
+- **👥 Lead Management**
   - Complete CRUD operations for leads
-  - Lead ownership tracking
-  - Status pipeline management (NEW → CONTACTED → QUALIFIED → PROPOSAL → NEGOTIATION → WON/LOST)
-  - Priority levels and tags
+  - Lead ownership and assignment
+  - Status pipeline (NEW → CONTACTED → QUALIFIED → PROPOSAL → NEGOTIATION → WON/LOST)
+  - Priority levels, tags, and value tracking
   - Full activity history trail
 
-- **Activity Timeline**
+- **📋 Activity Timeline**
   - Detailed logging of notes, calls, meetings, emails
   - Status change tracking
   - Duration and outcome recording
-  - Real-time updates
+  - Real-time updates via WebSocket
 
-- **Task Management**
+- **✅ Task Management**
   - Create and assign tasks to team members
-  - Due date tracking
-  - Priority management
-  - Task status workflow
+  - Due date tracking and reminders
+  - Priority management (LOW, MEDIUM, HIGH, URGENT)
+  - Task status workflow (TODO → IN_PROGRESS → COMPLETED → CANCELLED)
 
-- **Real-time Notifications**
+- **🔔 Real-time Notifications**
   - WebSocket-based instant notifications
   - Lead assignment alerts
-  - Task reminders
+  - Task deadline reminders
   - Status change notifications
+  - System announcements
 
-- **Dashboard & Analytics**
+- **📊 Dashboard & Analytics**
   - Performance metrics visualization
-  - Lead conversion funnel
-  - Revenue tracking
+  - Lead conversion funnel analysis
+  - Revenue tracking by status
   - Team performance indicators
-  - Interactive charts using Chart.js
+  - Interactive charts (Chart.js)
+
+### Bonus Features
+
+- **🎨 Marketing Landing Page**
+  - Modern, responsive hero section
+  - Feature showcase with animations
+  - Benefits & use cases
+  - Product roadmap timeline
+  - CTA sections for lead capture
+
+- **🔌 Third-Party Integrations**
+  - Slack webhook notifications
+  - Inbound webhook receiver
+  - HubSpot API ready (placeholder)
+  - Extensible integration framework
+
+- **📝 Comprehensive Logging**
+  - Winston logger with multiple transports
+  - HTTP request/response logging
+  - Error tracking and stack traces
+  - Audit middleware for sensitive operations
+  - Log viewing API endpoint
+
+- **🧪 Automated Testing**
+  - 91+ Jest test cases
+  - Unit tests for controllers and services
+  - Integration tests for API endpoints
+  - GitHub Actions CI/CD pipeline
+  - Code coverage reports
 
 ## Tech Stack
 
 ### Backend
-- **Runtime**: Node.js 18+
-- **Framework**: Express.js
-- **Language**: TypeScript
-- **Database**: PostgreSQL
-- **ORM**: Prisma
+- **Runtime**: Node.js 18+ LTS
+- **Framework**: Express.js 4.x
+- **Language**: TypeScript 5.3
+- **Database**: Supabase PostgreSQL
+- **ORM**: Prisma (with connection pooling)
 - **Authentication**: JWT + Bcrypt
-- **Validation**: Zod
+- **Validation**: Zod schemas
 - **Real-time**: Socket.io
+- **HTTP Client**: Axios
 - **Testing**: Jest + Supertest
 - **Logging**: Winston
+- **Security**: Helmet.js, CORS, Rate Limiting
 
 ### Frontend
 - **Framework**: React 18
-- **Language**: TypeScript
-- **Build Tool**: Vite
+- **Language**: TypeScript 5.3
+- **Build Tool**: Vite 5.x
 - **State Management**: Redux Toolkit
 - **Routing**: React Router v6
-- **Styling**: Tailwind CSS
+- **Styling**: Tailwind CSS 3.x
+- **Icons**: Lucide React
 - **HTTP Client**: Axios
+- **Charts**: Chart.js
+- **Real-time**: Socket.io Client
+
+### Infrastructure & DevOps
+- **Hosting**: Render (Frontend Static Site + Backend Web Service)
+- **Database**: Supabase (PostgreSQL + Auth + Storage + Email)
+- **Local Dev**: Docker Compose (PostgreSQL + Backend + Frontend)
+- **CI/CD**: GitHub Actions
+- **Version Control**: Git + GitHub
+- **Container**: Docker (multi-stage builds)
 - **Charts**: Chart.js + React-Chartjs-2
 - **Notifications**: React Hot Toast
 - **Real-time**: Socket.io Client
@@ -154,40 +238,133 @@ Access the application at **http://localhost** 🎉
 - npm or yarn
 - Docker (optional, for containerized deployment)
 
-### Quick Start (Local Development)
+---
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/p4r1ch4y/crm-system.git
-   cd crm-system
+## Production Deployment
+
+### Deploy to Render + Supabase
+
+**Step 1: Create Supabase Database**
+
+1. Sign up at [supabase.com](https://supabase.com)
+2. Create new project → Save database password
+3. Get connection string from Settings → Database
+4. Copy: `postgresql://postgres:[PASSWORD]@db.xxx.supabase.co:5432/postgres`
+
+**Step 2: Deploy Backend to Render**
+
+1. Go to [render.com](https://render.com) → New Web Service
+2. Connect GitHub repository
+3. Configure:
+   - **Root Directory**: `backend`
+   - **Build Command**: `npm install && npx prisma generate && npm run build`
+   - **Start Command**: `npm run start`
+4. Add environment variables (see below)
+5. Deploy! (takes ~3-5 minutes)
+
+**Step 3: Deploy Frontend to Render**
+
+1. New Static Site on Render
+2. Same GitHub repository
+3. Configure:
+   - **Root Directory**: `frontend`
+   - **Build Command**: `npm install && npm run build`
+   - **Publish Directory**: `dist`
+4. Add environment variable:
    ```
-
-2. **Setup Backend**
-   ```bash
-   cd backend
-   npm install
-   cp .env.example .env
-   # Edit .env with your database credentials
-   npx prisma migrate dev
-   npx prisma db seed
-   npm run dev
+   VITE_API_URL=https://your-backend.onrender.com/api/v1
+   VITE_SOCKET_URL=https://your-backend.onrender.com
    ```
+5. Deploy!
 
-3. **Setup Frontend**
-   ```bash
-   cd frontend
-   npm install
-   npm run dev
-   ```
+**Step 4: Run Database Migrations**
 
-4. **Access the application**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:5000
-   - API Health: http://localhost:5000/health
+In Render backend service shell:
+```bash
+npx prisma migrate deploy
+npx prisma db seed
+```
+
+📖 **Complete Deployment Guide**: [docs/DOCKER_DEPLOYMENT.md](docs/DOCKER_DEPLOYMENT.md)
+
+---
+
+## Local Development
+
+### Option 1: Docker Compose (Recommended)
+
+```bash
+# Clone repository
+git clone https://github.com/p4r1ch4y/crm-system.git
+cd MastersUnion
+
+# Start all services (Postgres + Backend + Frontend)
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Access:
+# Frontend: http://localhost:3000
+# Backend: http://localhost:5000
+# Database: localhost:5432
+```
+
+### Option 2: Manual Setup
+
+**1. Clone Repository**
+```bash
+git clone https://github.com/p4r1ch4y/crm-system.git
+cd MastersUnion
+```
+
+**2. Setup Supabase (or local PostgreSQL)**
+```bash
+# Option A: Use Supabase (recommended)
+# Create project at supabase.com, get connection string
+
+# Option B: Local PostgreSQL
+# Start PostgreSQL server (port 5432)
+# Create database: CREATE DATABASE crm_db;
+```
+
+**3. Setup Backend**
+```bash
+cd backend
+npm install
+cp .env.example .env
+
+# Edit .env with your database URL
+# Supabase: DATABASE_URL="postgresql://postgres:[PASSWORD]@db.xxx.supabase.co:5432/postgres"
+# Local: DATABASE_URL="postgresql://postgres:password@localhost:5432/crm_db"
+
+npx prisma generate
+npx prisma migrate deploy
+npx prisma db seed
+npm run dev
+```
+
+**4. Setup Frontend**
+```bash
+cd frontend
+npm install
+cp .env.example .env
+
+# Edit .env
+# VITE_API_URL=http://localhost:5000/api/v1
+# VITE_SOCKET_URL=http://localhost:5000
+
+npm run dev
+```
+
+**5. Access Application**
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:5000
+- API Health: http://localhost:5000/health
 
 ### Default Test Accounts
 
-After seeding the database, use these accounts to login:
+After seeding the database (`npx prisma db seed`):
 
 | Role | Email | Password |
 |------|-------|----------|
@@ -196,9 +373,18 @@ After seeding the database, use these accounts to login:
 | Sales Executive 1 | sales1@crm.com | Sales@123 |
 | Sales Executive 2 | sales2@crm.com | Sales@123 |
 
+---
+
 ## Installation
 
-### Backend Setup
+### System Requirements
+
+- **Node.js**: 18.0.0 or higher
+- **npm**: 9.0.0 or higher
+- **PostgreSQL**: 15+ (Supabase handles this)
+- **Docker**: 20.10+ (for local development only)
+
+### Backend Setup Details
 
 ```bash
 cd backend
@@ -349,6 +535,52 @@ Login to get access token
 ```
 
 ### Lead Endpoints
+
+### Integrations (Bonus)
+
+These endpoints provide integration capabilities with third-party systems such as Slack. Additional platforms (HubSpot, etc.) can be added following this pattern.
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | /api/v1/integrations/status | Returns integration configuration status (Slack, HubSpot placeholder, webhook capability) | User |
+| POST | /api/v1/integrations/slack/test | Sends a test message to the configured Slack webhook | User |
+| POST | /api/v1/integrations/webhook/inbound | Public inbound webhook receiver (echoes received payload) | Public |
+
+#### Slack Integration
+
+Configure an Incoming Webhook URL in environment variable `SLACK_WEBHOOK_URL`.
+
+Example test request:
+
+```
+POST /api/v1/integrations/slack/test
+Content-Type: application/json
+
+{
+  "text": "Deployment completed successfully!"
+}
+```
+
+#### Inbound Webhook Payload Example
+
+```
+POST /api/v1/integrations/webhook/inbound
+Content-Type: application/json
+
+{
+  "event": "lead.created",
+  "source": "partner-system",
+  "payload": {
+    "name": "John Doe",
+    "email": "john@example.com"
+  }
+}
+```
+
+#### Future (Planned)
+* HubSpot contact sync
+* WhatsApp / SMS provider integration
+* Custom workflow triggers to outbound webhooks
 
 #### GET /leads
 Get all leads with filtering and pagination
@@ -525,85 +757,170 @@ docker run -d --name frontend \
 
 ## Environment Variables
 
-### Backend (.env)
+### Backend Environment Variables
+
+**Production (Render + Supabase):**
+
+```env
+# Node Environment
+NODE_ENV=production
+PORT=5000
+
+# Supabase PostgreSQL Database
+DATABASE_URL=postgresql://postgres:[PASSWORD]@db.xxxxxxxxxxxxx.supabase.co:5432/postgres?pgbouncer=true&connection_limit=1
+DIRECT_URL=postgresql://postgres:[PASSWORD]@db.xxxxxxxxxxxxx.supabase.co:5432/postgres
+
+# JWT Authentication
+JWT_SECRET=your_generated_32_character_secret_here
+JWT_EXPIRES_IN=24h
+JWT_REFRESH_SECRET=your_refresh_secret_here
+JWT_REFRESH_EXPIRES_IN=7d
+
+# CORS - Frontend URL
+CORS_ORIGIN=https://smartcrm.onrender.com
+
+# Integrations (Optional)
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/WEBHOOK/URL
+HUBSPOT_API_KEY=your_hubspot_api_key
+
+# Email Service (Future - Supabase)
+EMAIL_ENABLED=false
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your_anon_key
+
+# Logging
+LOG_LEVEL=info
+```
+
+**Local Development:**
 
 ```env
 NODE_ENV=development
 PORT=5000
-DATABASE_URL=postgresql://user:password@localhost:5432/crm_db
 
-JWT_SECRET=your-super-secret-jwt-key
+# Local PostgreSQL (Docker)
+DATABASE_URL=postgresql://postgres:password@localhost:5432/crm_db?schema=public
+
+# JWT
+JWT_SECRET=dev-secret-change-in-production
 JWT_EXPIRES_IN=7d
-JWT_REFRESH_SECRET=your-refresh-secret
-JWT_REFRESH_EXPIRES_IN=30d
 
+# CORS
 CORS_ORIGIN=http://localhost:3000
 
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your-email@gmail.com
-SMTP_PASSWORD=your-app-password
-
-RATE_LIMIT_WINDOW_MS=900000
-RATE_LIMIT_MAX_REQUESTS=100
+# Logging
+LOG_LEVEL=debug
 ```
 
-### Frontend (.env)
+### Frontend Environment Variables
+
+**Production (Render):**
+
+```env
+VITE_API_URL=https://smartcrm-backend.onrender.com/api/v1
+VITE_SOCKET_URL=https://smartcrm-backend.onrender.com
+VITE_APP_NAME=SmartCRM Pro
+VITE_ENV=production
+```
+
+**Local Development:**
 
 ```env
 VITE_API_URL=http://localhost:5000/api/v1
+VITE_SOCKET_URL=http://localhost:5000
+VITE_APP_NAME=SmartCRM Pro (Dev)
+VITE_ENV=development
 ```
+
+### Generate Secure Secrets
+
+```bash
+# Generate JWT secret (Node.js)
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+
+# Generate JWT secret (PowerShell)
+[Convert]::ToBase64String((1..32 | ForEach-Object { Get-Random -Minimum 0 -Maximum 256 }))
+```
+
+---
 
 ## Project Structure
 
 ```
-crm-system/
+smartcrm-pro/
 ├── backend/
 │   ├── src/
-│   │   ├── controllers/      # Request handlers
-│   │   ├── middleware/       # Custom middleware
-│   │   ├── models/           # Type definitions
-│   │   ├── routes/           # API routes
-│   │   ├── services/         # Business logic
-│   │   ├── socket/           # WebSocket handlers
-│   │   ├── utils/            # Helper functions
-│   │   └── server.ts         # Entry point
+│   │   ├── controllers/      # Request handlers (auth, leads, tasks, analytics, integrations)
+│   │   ├── middleware/       # Auth, validation, error handling, audit logging
+│   │   ├── models/           # TypeScript type definitions
+│   │   ├── routes/           # Express API routes
+│   │   ├── services/         # Business logic (Slack, email, etc.)
+│   │   ├── socket/           # WebSocket handlers (real-time notifications)
+│   │   ├── utils/            # Helper functions (logger, validators)
+│   │   └── server.ts         # Express server entry point
 │   ├── prisma/
-│   │   ├── schema.prisma     # Database schema
-│   │   ├── migrations/       # Database migrations
-│   │   └── seed.ts           # Seed data
-│   ├── tests/                # Test files
-│   ├── Dockerfile
+│   │   ├── schema.prisma     # Database schema (5 models, enums)
+│   │   ├── migrations/       # Prisma migrations
+│   │   └── seed.ts           # Test user seed data
+│   ├── tests/                # Jest test files (91 tests)
+│   ├── logs/                 # Winston log files
+│   ├── Dockerfile            # Multi-stage Docker build
 │   ├── package.json
 │   └── tsconfig.json
 │
 ├── frontend/
 │   ├── src/
-│   │   ├── components/       # React components
-│   │   │   ├── common/       # Shared components
-│   │   │   ├── dashboard/    # Dashboard components
-│   │   │   ├── leads/        # Lead components
-│   │   │   ├── activities/   # Activity components
-│   │   │   └── tasks/        # Task components
-│   │   ├── pages/            # Page components
-│   │   ├── store/            # Redux store
-│   │   │   └── slices/       # Redux slices
-│   │   ├── services/         # API services
-│   │   ├── hooks/            # Custom hooks
-│   │   ├── types/            # TypeScript types
+│   │   ├── components/
+│   │   │   ├── common/       # Reusable UI components (MainLayout, Sidebar, Navbar)
+│   │   │   ├── dashboard/    # Dashboard charts and metrics
+│   │   │   ├── leads/        # Lead management components
+│   │   │   ├── activities/   # Activity timeline
+│   │   │   └── tasks/        # Task management
+│   │   ├── pages/
+│   │   │   ├── LandingPage.tsx      # Marketing landing page
+│   │   │   ├── IntegrationsPage.tsx # Third-party integrations UI
+│   │   │   ├── DashboardPage.tsx    # Analytics dashboard
+│   │   │   ├── LeadsPage.tsx        # Lead management
+│   │   │   └── ... (login, register, tasks, activities)
+│   │   ├── store/            # Redux Toolkit store
+│   │   │   └── slices/       # Auth, leads, tasks, notifications slices
+│   │   ├── services/         # Axios API clients
+│   │   ├── hooks/            # Custom React hooks (useAuth, useSocket)
+│   │   ├── types/            # TypeScript interfaces
 │   │   ├── utils/            # Helper functions
-│   │   ├── App.tsx           # Root component
+│   │   ├── App.tsx           # Root component with routing
 │   │   └── main.tsx          # Entry point
-│   ├── public/               # Static assets
-│   ├── Dockerfile
-│   ├── nginx.conf
+│   ├── public/
+│   │   └── favicon.svg       # Custom gradient Zap icon favicon
+│   ├── Dockerfile            # Multi-stage build (Node + Nginx)
+│   ├── nginx.conf            # Nginx config for SPA
 │   ├── package.json
 │   ├── tailwind.config.js
 │   └── vite.config.ts
 │
+├── docs/                     # Comprehensive documentation
+│   ├── ARCHITECTURE.md       # System design, ER diagrams, workflows (NEW)
+│   ├── API_DOCUMENTATION.md  # Complete API reference
+│   ├── DATABASE_SETUP.md     # Supabase + local setup
+│   ├── DOCKER_DEPLOYMENT.md  # Render deployment guide (updated)
+│   ├── SETUP_GUIDE.md        # Installation instructions
+│   ├── TESTING_GUIDE.md      # Testing strategy
+│   └── LOGGING_IMPLEMENTATION.md  # Winston logging docs
+│
 ├── docker/
-│   ├── docker-compose.yml
-│   └── .env.example
+│   └── docker-compose.yml    # Local development stack
+│
+├── .github/
+│   └── workflows/
+│       └── ci.yml            # GitHub Actions CI/CD
+│
+├── db/
+│   ├── ERD.png               # Entity Relationship Diagram
+│   └── README.md
+│
+├── docker-compose.yml        # Root compose file (Postgres + Backend + Frontend)
+├── .env.example              # Environment template
+└── README.md                 # This file
 │
 ├── db/
 │   ├── ERD.png              # Entity Relationship Diagram
@@ -611,6 +928,17 @@ crm-system/
 │
 └── README.md
 ```
+
+## Documentation
+
+All detailed documentation has been organized in the `/docs` directory for easy access:
+
+- **[Setup Guide](docs/SETUP_GUIDE.md)** - Comprehensive installation and configuration instructions
+- **[API Documentation](docs/API_DOCUMENTATION.md)** - Complete API reference with examples
+- **[Database Setup](docs/DATABASE_SETUP.md)** - Database configuration, schema, and migrations
+- **[Docker Deployment](docs/DOCKER_DEPLOYMENT.md)** - Docker deployment and container management
+- **[Testing Guide](docs/TESTING_GUIDE.md)** - Testing strategy, implementation, and running tests
+- **[Logging Implementation](docs/LOGGING_IMPLEMENTATION.md)** - Logging architecture and best practices
 
 ## Key Features Implementation
 

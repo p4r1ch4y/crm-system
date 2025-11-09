@@ -7,6 +7,7 @@ import { useAppSelector } from './hooks/redux';
 import { ThemeProvider } from './context/ThemeContext';
 
 // Pages
+import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
@@ -15,6 +16,7 @@ import LeadDetailPage from './pages/LeadDetailPage';
 import TasksPage from './pages/TasksPage';
 import ActivitiesPage from './pages/ActivitiesPage';
 import LogsPage from './pages/LogsPage';
+import IntegrationsPage from './pages/IntegrationsPage';
 
 // Layout
 import MainLayout from './components/common/MainLayout';
@@ -26,29 +28,38 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 };
 
 function AppRoutes() {
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
+
   return (
     <Routes>
+      {/* Public landing page */}
+      <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       
+      {/* Protected app routes */}
       <Route
-        path="/"
+        path="/app"
         element={
           <ProtectedRoute>
             <MainLayout />
           </ProtectedRoute>
         }
       >
-        <Route index element={<Navigate to="/dashboard" replace />} />
+        <Route index element={<Navigate to="/app/dashboard" replace />} />
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="leads" element={<LeadsPage />} />
         <Route path="leads/:id" element={<LeadDetailPage />} />
         <Route path="tasks" element={<TasksPage />} />
         <Route path="activities" element={<ActivitiesPage />} />
         <Route path="logs" element={<LogsPage />} />
+  <Route path="integrations" element={<IntegrationsPage />} />
       </Route>
 
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      {/* Redirect authenticated users to app, others to landing */}
+      <Route path="*" element={
+        isAuthenticated ? <Navigate to="/app/dashboard" replace /> : <Navigate to="/" replace />
+      } />
     </Routes>
   );
 }

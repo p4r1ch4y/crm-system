@@ -14,6 +14,9 @@ module.exports = {
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
   moduleFileExtensions: ['ts', 'js', 'json'],
+  moduleNameMapper: {
+    axios: require.resolve('axios'),
+  },
   verbose: true,
   testTimeout: 10000,
 };
